@@ -1,17 +1,165 @@
 ---
+import Base from "../layouts/Base.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
 
+const posts = await getCollection("posts");
+
+const latest = [...posts]
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 8);
+
+const firstPost = latest[0];
+const sidePosts = latest.slice(1, 5);
+const bottomPosts = latest.slice(5, 8); 
+
+const editorPicks = posts.filter((p: CollectionEntry<"posts">) => p.data.editorPick);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base>
+  <div class="hero-grid" style="margin-bottom: 2rem;">
+    {firstPost && (
+      <a href={`/post/${firstPost.slug}/`} class="post-card hero-main">
+        <div class="image-wrapper">
+          {firstPost.data.cover && (
+            <img src={firstPost.data.cover} alt={firstPost.data.title} />
+          )}
+        </div>
+        <div class="card-body">
+          <h3>{firstPost.data.title}</h3>
+          
+          <div class="meta-inline">
+            <span class="meta-category">{firstPost.data.category.label}</span>
+            {firstPost.data.tags && firstPost.data.tags.length > 0 && (
+              <>
+                <span class="meta-separator">/</span>
+                <span class="meta-tag">{firstPost.data.tags[0]}</span>
+              </>
+            )}
+            <span class="meta-separator">•</span>
+            <span class="meta-date">{firstPost.data.date.toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' })}</span>
+          </div>
+
+          {firstPost.data.description && <p>{firstPost.data.description}</p>}
+        </div>
+      </a>
+    )}
+
+    <div class="hero-side">
+      {sidePosts.map((post: CollectionEntry<"posts">) => (
+        <a href={`/post/${post.slug}/`} class="post-card side-card">
+          <div class="image-wrapper">
+            {post.data.cover && (
+              <img src={post.data.cover} alt={post.data.title} />
+            )}
+          </div>
+          <div class="card-body">
+            <h3>{post.data.title}</h3>
+            
+            <div class="meta-inline">
+              <span class="meta-category">{post.data.category.label}</span>
+              {post.data.tags && post.data.tags.length > 0 && (
+                <>
+                  <span class="meta-separator">/</span>
+                  <span class="meta-tag">{post.data.tags[0]}</span>
+                </>
+              )}
+              <span class="meta-separator">•</span>
+              <span class="meta-date">{post.data.date.toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' })}</span>
+            </div>
+
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  {bottomPosts.length > 0 && (
+    <div class="bottom-grid" style="margin-bottom: 4rem;">
+      {bottomPosts.map((post: CollectionEntry<"posts">) => (
+        <a href={`/post/${post.slug}/`} class="post-card bottom-card">
+          <div class="image-wrapper">
+            {post.data.cover && (
+              <img src={post.data.cover} alt={post.data.title} />
+            )}
+          </div>
+          <div class="card-body">
+            <h3>{post.data.title}</h3>
+            
+            <div class="meta-inline">
+              <span class="meta-category">{post.data.category.label}</span>
+              {post.data.tags && post.data.tags.length > 0 && (
+                <>
+                  <span class="meta-separator">/</span>
+                  <span class="meta-tag">{post.data.tags[0]}</span>
+                </>
+              )}
+              <span class="meta-separator">•</span>
+              <span class="meta-date">{post.data.date.toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' })}</span>
+            </div>
+
+          </div>
+        </a>
+      ))}
+    </div>
+  )}
+
+  {editorPicks.length > 0 && (
+    <section class="editor-section">
+      <div class="editor-header">
+        <h2 class="section-title">Editörün Seçtikleri</h2>
+        <div class="controls">
+          <button class="carousel-btn" id="editor-prev">‹</button>
+          <button class="carousel-btn" id="editor-next">›</button>
+        </div>
+      </div>
+
+      <div class="carousel-wrapper">
+        <div class="carousel" id="editor-carousel">
+          {editorPicks.slice(0, 5).map((post: CollectionEntry<"posts">) => (
+            <a href={`/post/${post.slug}/`} class="carousel-card">
+              <div class="image-wrapper">
+                {post.data.cover && (
+                  <img src={post.data.cover} alt={post.data.title} />
+                )}
+              </div>
+              <div class="card-body">
+                <h3>{post.data.title}</h3>
+                
+                <div class="meta-inline">
+                  <span class="meta-category">{post.data.category.label}</span>
+                  {post.data.tags && post.data.tags.length > 0 && (
+                    <>
+                      <span class="meta-separator">/</span>
+                      <span class="meta-tag">{post.data.tags[0]}</span>
+                    </>
+                  )}
+                  <span class="meta-separator">•</span>
+                  <span class="meta-date">{post.data.date.toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' })}</span>
+                </div>
+
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const carousel = document.getElementById("editor-carousel");
+      const prev = document.getElementById("editor-prev");
+      const next = document.getElementById("editor-next");
+
+      if (!carousel || !prev || !next) return;
+      const scrollAmount = 320;
+
+      prev.addEventListener("click", () => {
+        carousel.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      });
+      next.addEventListener("click", () => {
+        carousel.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      });
+    });
+  </script>
+</Base>

@@ -1,5 +1,9 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "include": ["**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/pages/kategori/[slug].astro"
+  ]
 }

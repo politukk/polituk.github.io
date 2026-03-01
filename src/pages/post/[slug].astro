@@ -1,0 +1,47 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post: CollectionEntry<"posts">) => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render(); // Markdown içeriğini render etmek için gerekli
+---
+
+<Base>
+  <article class="post-detail">
+    <header class="post-header">
+      <div class="badges">
+        <span class="category">{post.data.category.label}</span>
+        {/* Etiketleri listeliyoruz */}
+        {post.data.tags && post.data.tags.map(tag => (
+          <span class="tag-badge" style="margin-left: 8px; opacity: 0.8;">#{tag}</span>
+        ))}
+      </div>
+      
+      <h1 class="post-title" data-pagefind-meta="title">{post.data.title}</h1>
+      
+      <div class="post-meta">
+        <span class="author">{post.data.author}</span> <span class="dot">•</span>
+        <span class="dot">•</span>
+        <time>{post.data.date.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+      </div>
+    </header>
+
+    {post.data.cover && (
+      <div class="post-hero">
+        <img src={post.data.cover} alt={post.data.title} />
+      </div>
+    )}
+
+    <div class="post-content">
+      <Content />
+    </div>
+  </article>
+</Base>

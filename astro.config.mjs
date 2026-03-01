@@ -1,5 +1,6 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 
-// https://astro.build/config
-export default defineConfig({});
+export default defineConfig({
+  // Kendi GitHub kullanıcı adını ve depo adını yaz:
+  site: 'https://polituk.github.io',
+});

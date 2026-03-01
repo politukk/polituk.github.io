@@ -1,0 +1,75 @@
+---
+import "../styles/global.css";
+import Search from "astro-pagefind/components/Search";
+---
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>polİTÜk | Sanat ve Kültür</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <header class="site-header" data-pagefind-ignore>
+      <div class="header-wrapper">
+        <div class="header-left">
+          <div class="brand">
+            <a href="/" class="home-link">
+              <h1>pol<span class="itu-text">İTÜ</span>k</h1>
+            </a>
+            <p class="subtitle">Kanzi Olmayan Mühendisler de Vardır</p>
+          </div>
+
+          <nav class="header-nav">
+            <ul class="nav-links">
+              {/* Eski kategoriler yerine yeni 2 ana kategoriyi ekledik */}
+              <li><a href="/kategori/gundem/1">Gündem</a></li>
+              <li><a href="/kategori/kultur/1">Kültür</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <div class="header-right">
+          <Search 
+            id="search" 
+            className="pagefind-ui" 
+            uiOptions={{ 
+              showImages: false, // Resimleri gizle (daha hızlı ve temiz)
+              showSubResults: false,
+              resetStyles: false 
+            }} 
+          />
+
+          <div class="divider"></div>
+
+          <div class="social-links">
+            <a href="https://twitter.com/politukdegil" target="_blank" rel="noopener noreferrer" class="icon-btn" title="X (Twitter)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 22.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+            
+            <a href="https://instagram.com/polituk" target="_blank" rel="noopener noreferrer" class="icon-btn" title="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      © {new Date().getFullYear()} polİTÜk
+    </footer>
+  </body>
+</html> 

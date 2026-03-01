@@ -1,0 +1,106 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const POSTS_PER_PAGE = 10;
+  const posts = await getCollection("posts");
+
+  const byCategory = posts.reduce<Record<string, CollectionEntry<"posts">[]>>((acc, post) => {
+    const slug = post.data.category.slug;
+    acc[slug] ??= [];
+    acc[slug].push(post);
+    return acc;
+  }, {});
+
+  const paths = [];
+
+  for (const [slug, categoryPosts] of Object.entries(byCategory)) {
+    const totalPages = Math.ceil(categoryPosts.length / POSTS_PER_PAGE);
+
+    for (let page = 1; page <= totalPages; page++) {
+      paths.push({
+        params: {
+          slug, 
+          page: String(page)
+        },
+        props: {
+          posts: [...categoryPosts]
+            .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+            .slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE),
+          currentPage: page,
+          totalPages,
+          category: categoryPosts[0].data.category
+        }
+      });
+    }
+  }
+
+  return paths;
+}
+
+interface Props {
+  posts: CollectionEntry<"posts">[];
+  currentPage: number;
+  totalPages: number;
+  category: {
+    slug: string;
+    label: string;
+  };
+}
+
+const { posts, currentPage, totalPages, category } = Astro.props;
+---
+
+<Base>
+  <div data-pagefind-ignore> <section class="archive-header">
+      <h1 class="archive-title">{category.label}</h1>
+      <div class="archive-line"></div>
+    </section>
+
+    <div class="archive-grid">
+      {posts.map((singlePost) => (
+        <article class="archive-card">
+          <a href={`/post/${singlePost.slug}/`} class="archive-image">
+            {singlePost.data.cover ? (
+              <img src={singlePost.data.cover} alt={singlePost.data.title} />
+            ) : (
+              <div class="placeholder-img">polİTÜk</div>
+            )}
+          </a>
+          <div class="archive-content">
+            <h2 class="archive-post-title">
+              <a href={`/post/${singlePost.slug}/`}>{singlePost.data.title}</a>
+            </h2>
+            {singlePost.data.description && (
+              <p class="archive-excerpt">{singlePost.data.description}</p>
+            )}
+            <div class="archive-meta">
+            <div class="tags">
+              {singlePost.data.tags && singlePost.data.tags.map(tag => (
+                <span class="archive-tag">#{tag}</span>
+              ))}
+            </div>
+            <time>{singlePost.data.date.toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' })}</time>
+            <span class="read-more">Okumaya Devam Et →</span>
+          </div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    {totalPages > 1 && (
+      <nav class="pagination">
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(num => (
+          <a
+            href={`/kategori/${category.slug}/${num}/`}
+            class={num === currentPage ? "active" : ""}
+          >
+            {num}
+          </a>
+        ))}
+      </nav>
+    )}
+    
+  </div>
+</Base>
